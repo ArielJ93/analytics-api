@@ -5,7 +5,7 @@ from .config import settings
 from sqlalchemy import text
 
 
-if DATABASE_URL == "":
+if settings.DATABASE_URL == "":
     raise NotImplementedError("DATABASE_URL needs to be set")
 
 #engine = timescaledb.create_engine(DATABASE_URL, timezone=DB_TIMEZONE)
