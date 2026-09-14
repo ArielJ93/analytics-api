@@ -1,11 +1,11 @@
-fastapi==0.115.11
+fastapi[standard]
 uvicorn
 gunicorn
 sqlmodel
 pydantic
 sqlalchemy
-timescaledb
+#timescaledb
 requests
-python-decouple
+#python-decouple
 psycopg[binary] # psycopg v3
 # psycopg2-binary
