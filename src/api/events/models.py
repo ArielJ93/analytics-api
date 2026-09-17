@@ -3,7 +3,7 @@ from typing import List, Optional
 # from pydantic import BaseModel, Field
 #import sqlmodel
 from sqlmodel import SQLModel, Field
-from sqlalchemy import DateTime, Column, Integer
+from sqlalchemy import DateTime, Column, Integer, BigInteger
 #from timescaledb import TimescaleModel
 #from timescaledb.utils import get_utc_now
 
@@ -18,17 +18,19 @@ class EventModel(SQLModel, table=True):
         sa_column= Column(Integer, autoincrement=True, primary_key=True) 
         )
     #description: Optional[str] = ""
-    created_at: datetime = Field(
+    timestamp: datetime = Field(
         default_factory= get_utc_now,
         sa_column=Column(DateTime(timezone=True), primary_key=True, nullable=False),
     )
     
-    page: str = Field(index=True) # /about, /contact, # pricing
-    user_agent: Optional[str] = Field(default="", index=True) # browser
-    ip_address: Optional[str] = Field(default="", index=True)
-    referrer: Optional[str] = Field(default="", index=True) 
-    session_id: Optional[str] = Field(index=True)
-    duration: Optional[int] = Field(default=0) 
+    symbol: Optional[str] = Field(default="", index=True)
+    price: Optional[float] = Field(default=0.0)
+    volume_24h: Optional[float] = Field(default=0.0)   #float64            
+    change_24h: Optional[float] = Field(default=0.0)   #float64            
+    market_cap: Optional[int] = Field(sa_column= Column(BigInteger), default=0)   #int64              
+    rank: Optional[int] = Field(default=0)  #int64              
+    high_24h: Optional[float] = Field(default=0.0)  #float64            
+    low_24h: Optional[float] = Field(default=0.0)   #float64 
 
     #__chunk_time_interval__ = "INTERVAL 1 day"
     #__drop_after__ = "INTERVAL 3 months"
@@ -41,12 +43,15 @@ class EventModel(SQLModel, table=True):
     #)
 
 class EventCreateSchema(SQLModel):
-    page: str
-    user_agent: Optional[str] = Field(default="", index=True) # browser
-    ip_address: Optional[str] = Field(default="", index=True)
-    referrer: Optional[str] = Field(default="", index=True) 
-    session_id: Optional[str] = Field(index=True)
-    duration: Optional[int] = Field(default=0) 
+    timestamp: Optional[str] = Field(default="")
+    symbol: Optional[str] = Field(default="", index=True)
+    price: Optional[float] = Field(default=0.0)
+    volume_24h: Optional[float] = Field(default=0.0)   #float64            
+    change_24h: Optional[float] = Field(default=0.0)   #float64            
+    market_cap: Optional[int] = Field(default=0)   #int64              
+    rank: Optional[int] = Field(default=0)  #int64              
+    high_24h: Optional[float] = Field(default=0.0)  #float64            
+    low_24h: Optional[float] = Field(default=0.0)   #float64 
 
 
 # class EventUpdateSchema(SQLModel):
@@ -55,15 +60,16 @@ class EventCreateSchema(SQLModel):
 
 # {"id": 12}
 
-class EventListSchema(SQLModel):
-    results: List[EventModel]
-    count: int
+# class EventListSchema(SQLModel):
+#     results: List[EventModel]
+#     count: int
 
 
 class EventBucketSchema(SQLModel):
     bucket: datetime
-    page: str
-    ua: Optional[str] = ""
-    operating_system: Optional[str] = ""
-    avg_duration: Optional[float] = 0.0
+    symbol: str
+    avg_price: Optional[float] = 0.0
     count: int
+    market_cap: int
+    volume_24h: Optional[float] = 0.0            
+    change_24h: Optional[float] =  0.0   
