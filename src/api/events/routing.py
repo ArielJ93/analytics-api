@@ -70,6 +70,8 @@ def read_events(
         )
     )
     results = session.exec(query).fetchall()
+    if not results:
+        return []
     return results
 
 # SEND DATA HERE
