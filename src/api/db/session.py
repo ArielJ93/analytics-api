@@ -23,7 +23,7 @@ def init_db():
             text("""
                 SELECT create_hypertable(
                     'eventmodel', 
-                    'created_at', 
+                    'timestamp', 
                     chunk_time_interval => INTERVAL '1 day',
                     if_not_exists => true
                 );
