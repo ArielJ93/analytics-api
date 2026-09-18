@@ -1,22 +1,21 @@
-import os
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlmodel import Session, select, func
 from sqlalchemy import text, cast
 from sqlalchemy.dialects.postgresql import INTERVAL
 from datetime import datetime, timedelta, timezone
 from api.db.session import get_session
 from api.db.config import settings
-#from timescaledb.hyperfunctions import time_bucket
+
 
 from .models import (
     EventModel, 
     EventBucketSchema, 
     EventCreateSchema,
-    # get_utc_now,
-    # EventListSchema,
-    #EventUpdateSchema
+    
 )
+from api.db.limiter import limiter
+
 router = APIRouter()
 
 DEFAULT_SYMBOLS = [
@@ -27,10 +26,13 @@ DEFAULT_SYMBOLS = [
 # List View
 # GET /api/events/
 @router.get("/", response_model=List[EventBucketSchema])
+@limiter.limit("5/minute")
 def read_events(
+    request: Request,
     duration: str=Query(default='1 day'),
     symbol: List[str]=Query(default=None),
-    session:Session=Depends(get_session)):
+    session:Session=Depends(get_session),
+    ):
     
     
     interval = cast(duration, INTERVAL)
@@ -62,7 +64,9 @@ def read_events(
 # create view
 # POST /api/events/
 @router.post("/", response_model=List[EventModel])
+@limiter.limit("5/minute")
 def create_event(
+        request: Request,
         payload: List[EventCreateSchema], 
         session: Session = Depends(get_session)):
 

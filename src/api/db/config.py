@@ -8,7 +8,7 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     DATABASE_URL: str = Field(default="")
-    #DB_TIMEZONE: str = Field(default="UTC")
+    DATABASE_REDIS: str = Field(default="")
     
     model_config = SettingsConfigDict(env_file=".env")
     

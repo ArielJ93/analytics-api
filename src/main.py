@@ -1,9 +1,13 @@
 from contextlib import asynccontextmanager
-from typing import Union
 
 from fastapi import FastAPI
 from api.db.session import init_db
 from api.events import router as event_router
+from fastapi.middleware.cors import CORSMiddleware
+
+from slowapi import  _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from api.db.limiter import limiter
 
 
 @asynccontextmanager
@@ -16,17 +20,30 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(event_router, prefix='/api/events')
+#CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ['*'],
+    allow_credentials = False,
+    allow_methods = ['GET'],
+    allow_headers = ['*']
+)
+# Register the error handler limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
 # /api/events
-
-
 @app.get("/")
-def read_root():
+@limiter.limit("5/minute")
+def read_root(request: Request):
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/items/")
+@limiter.limit("5/minute")
+async def get_items(request: Request):
+    return {"message": "You can access this up to 5 times per minute"}
 
 
 @app.get("/healthz")
