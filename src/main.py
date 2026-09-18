@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from api.db.session import init_db
 from api.events import router as event_router
 from fastapi.middleware.cors import CORSMiddleware
