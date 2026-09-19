@@ -13,7 +13,8 @@ from .models import (
     EventBucketSchema, 
     EventCreateSchema,
     DurationEnum,
-    HistoryEnum
+    HistoryEnum, 
+    EventCreateResponse
 )
 
 from api.limiter import limiter
@@ -91,7 +92,7 @@ def read_events(
 # SEND DATA HERE
 # create view
 # POST /api/events/
-@router.post("/", response_model=dict, dependencies=[Depends(apk)])
+@router.post("/", response_model=EventCreateResponse, dependencies=[Depends(apk)])
 @limiter.limit("5/minute")
 def create_event(
         request: Request,

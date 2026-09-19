@@ -1,0 +1,19 @@
+
+name: inyection-data-script
+
+on:
+    schedule: 
+        - cron: "5 * * * *"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v3
+            - name: python config
+              uses: actions/setup-python@v5
+            with:
+                python-version: '3.14'
+            - name: install dependencies
+              run: pip install

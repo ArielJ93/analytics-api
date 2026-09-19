@@ -17,7 +17,7 @@ def init_db():
     SQLModel.metadata.create_all(engine)
     #print("creating hypertables")
     #timescaledb.metadata.create_all(engine)
-    print("Converting 'eventmodel' to hypertable") #converting manually cuz function "add_retention_policy" is not supported under the current "apache" license
+    print("Converting 'eventmodel' to hypertable") #converting manually cuz "add_retention_policy" is not supported under the current "apache" license in aiven
     with Session(engine) as session:
         session.execute(
             text("""
