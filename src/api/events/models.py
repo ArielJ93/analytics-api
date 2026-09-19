@@ -41,7 +41,6 @@ class EventModel(SQLModel, table=True):
     #)
 
 class EventCreateSchema(SQLModel):
-    timestamp: datetime
     symbol: str = Field(max_length=10)
     price: float = Field(ge=0.0, le=10000000000000.0)
     volume_24h: Optional[float] = Field(default=0.0, ge=0.0, le=10000000000000.0)   #float64            

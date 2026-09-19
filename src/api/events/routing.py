@@ -54,7 +54,15 @@ def read_events(
     #Round timestamp down into fixed intervals based on the duration parameter
     bucket = func.public.time_bucket(duration_interval, EventModel.timestamp)
     
- 
+    """
+    -Vista Diaria (ultimas 24 horas):
+        history = "1 day" + duration = "15 minutes" (devuelve 96 puntos). Ideal para ver el detalle de lo que pasó hoy.
+    -Vista Semanal (ultimos 7 días):
+        history = "7 days" + duration = "1 hour" (devuelve 168 puntos). Mejor combinación.
+    -Vista Mensual (ultimos 30 días):
+        history = "30 days" + duration = "4 hours" (devuelve 180 puntos).
+        history = "30 days" + duration = "1 day" (devuelve 30 puntos). Perfecta para gráficos limpios de largo plazo.
+    """
     
     lookup_symbols = symbol if isinstance(symbol,list) and len(symbol) > 0 else None
     query = (
