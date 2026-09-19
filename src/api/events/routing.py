@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Annotated
+from pydantic import StringConstraints
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlmodel import Session, select, func
 from sqlalchemy import text, cast
@@ -7,20 +8,23 @@ from datetime import datetime, timedelta, timezone
 from api.db.session import get_session
 from api.db.config import settings
 
-
 from .models import (
     EventModel, 
     EventBucketSchema, 
     EventCreateSchema,
-    
+    DurationEnum,
+    HistoryEnum
 )
-from api.db.limiter import limiter
+
+from api.limiter import limiter
+from fastapi.security import APIKeyHeader
+from api.dependencies import streamlit_api_key as sta, automation_api_key as apk
 
 router = APIRouter()
 
-DEFAULT_SYMBOLS = [
-        "btc", "eth", "ltc", "bch", "bnb", "eos", "xrp", "xlm", "link", "dot", "yfi", "sol",
-    ]
+# DEFAULT_SYMBOLS = [
+#         "btc", "eth", "ltc", "bch", "bnb", "eos", "xrp", "xlm", "link", "dot", "yfi", "sol",
+#     ]
 
 # Get data here
 # List View
@@ -29,15 +33,30 @@ DEFAULT_SYMBOLS = [
 @limiter.limit("5/minute")
 def read_events(
     request: Request,
-    duration: str=Query(default='1 day'),
-    symbol: List[str]=Query(default=None),
+    symbol: 
+        Annotated[
+            List[
+                Annotated[
+                    str,
+                    StringConstraints(max_length=10, pattern=r"^[a-zA-Z0-9]+$")
+                ]
+            ],
+            Query(..., max_length=100)
+        ],
+    history: HistoryEnum = HistoryEnum.seven_days,
+    duration: DurationEnum = DurationEnum.one_hour,
     session:Session=Depends(get_session),
     ):
     
     
-    interval = cast(duration, INTERVAL)
-    bucket = func.public.time_bucket(interval, EventModel.timestamp)
-    lookup_symbols = symbol if isinstance(symbol,list) and len(symbol) > 0 else DEFAULT_SYMBOLS
+    duration_interval = cast(duration, INTERVAL)
+    history_interval = cast(history, INTERVAL)
+    #Round timestamp down into fixed intervals based on the duration parameter
+    bucket = func.public.time_bucket(duration_interval, EventModel.timestamp)
+    
+ 
+    
+    lookup_symbols = symbol if isinstance(symbol,list) and len(symbol) > 0 else None
     query = (
         select(
             EventModel.symbol,
@@ -49,7 +68,8 @@ def read_events(
             func.last(EventModel.change_24h, EventModel.timestamp).label("change_24h")
                 )
             .where(
-                EventModel.symbol.in_(lookup_symbols)
+                EventModel.symbol.in_(lookup_symbols),
+                EventModel.timestamp >= func.now() - history_interval
                 )
             .group_by(
                 bucket, 
@@ -63,21 +83,20 @@ def read_events(
 # SEND DATA HERE
 # create view
 # POST /api/events/
-@router.post("/", response_model=List[EventModel])
+@router.post("/", response_model=dict, dependencies=[Depends(apk)])
 @limiter.limit("5/minute")
 def create_event(
         request: Request,
         payload: List[EventCreateSchema], 
-        session: Session = Depends(get_session)):
+        session: Session = Depends(get_session),
+        ):
 
     data = [EventModel.model_validate(i.model_dump()) for i in payload]
     
     session.add_all(data)
     session.commit()
-    for i in data:
-        session.refresh(i)
     
-    return data
+    return {"status": "success", "inserted_records": len(data)}
 
 
 # GET /api/events/12
