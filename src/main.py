@@ -1,13 +1,14 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
+
 from api.db.session import init_db
 from api.events import router as event_router
 from fastapi.middleware.cors import CORSMiddleware
 
 from slowapi import  _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from api.db.limiter import limiter
+from api.limiter import limiter
 
 
 @asynccontextmanager
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 app.include_router(event_router, prefix='/api/events')
 #CORS
 app.add_middleware(
@@ -26,8 +28,10 @@ app.add_middleware(
     allow_origins = ['*'],
     allow_credentials = False,
     allow_methods = ['GET'],
-    allow_headers = ['*']
+    allow_headers = ['content-type', 'X-API-KEY']
 )
+
+
 # Register the error handler limiter
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -39,11 +43,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 def read_root(request: Request):
     return {"Hello": "World"}
 
-
-@app.get("/items/")
-@limiter.limit("5/minute")
-async def get_items(request: Request):
-    return {"message": "You can access this up to 5 times per minute"}
 
 
 @app.get("/healthz")
