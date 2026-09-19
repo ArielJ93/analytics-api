@@ -3,17 +3,24 @@ name: inyection-data-script
 
 on:
     schedule: 
-        - cron: "5 * * * *"
+        - cron: "*/5 * * * *"
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
             - name: checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: python config
               uses: actions/setup-python@v5
-            with:
+              with:
                 python-version: '3.14'
             - name: install dependencies
-              run: pip install
+              run: pip install -r requirements.txt
+            - name: run script
+              env:
+                COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+                AUTOMATION_API_KEY: ${{ secrets.AUTOMATION_API_KEY }}
+              run: python -m scripts.inyect
+                
+                
