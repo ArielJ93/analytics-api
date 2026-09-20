@@ -28,5 +28,5 @@ def get_data() -> List:
 
 if __name__ == "__main__":
     data_test = get_data()
-    print(type(data_test))
-    #pprint(data_test)
+    #print(type(data_test))
+    pprint(data_test)

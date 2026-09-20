@@ -16,7 +16,7 @@ def api_inyection(data, create_endpoint, headers):
 if __name__ == "__main__":
     
     base_url = "https://analytics-api-hg65.onrender.com"
-    path = "/api/events/"
+    path = "/api/v1/analytics"
     create_endpoint = f"{base_url}{path}"
     
     headers = {
