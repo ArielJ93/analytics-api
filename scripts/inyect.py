@@ -1,7 +1,7 @@
 from scripts.transform import transform_data, cleaning_data
 from scripts.extract import get_data
 import requests
-from src.api.db.config import settings
+from scripts.config import settings
 
 
 def api_inyection(data, create_endpoint, headers):

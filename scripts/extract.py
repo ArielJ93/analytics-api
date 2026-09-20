@@ -3,7 +3,7 @@ import requests
 from pprint import pprint
 from typing import List
     
-from src.api.db.config import settings
+from scripts.config import settings
 
 def get_data() -> List:
     API_KEY = settings.COINGECKO_API_KEY
