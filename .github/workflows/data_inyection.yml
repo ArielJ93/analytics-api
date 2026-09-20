@@ -16,7 +16,7 @@ jobs:
               with:
                 python-version: '3.14'
             - name: install dependencies
-              run: pip install -r requirements.txt
+              run: pip install pydantic requests
             - name: run script
               env:
                 COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
