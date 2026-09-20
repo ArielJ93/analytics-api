@@ -19,9 +19,11 @@ async def lifespan(app: FastAPI):
     # clean up
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan,
+            title= "Crypto Analytics API",
+            version= "1.0.0")
 
-app.include_router(event_router, prefix='/api/events')
+app.include_router(event_router, prefix='/api/v1/analytics', tags=["Crypto Analytics"])
 #CORS
 app.add_middleware(
     CORSMiddleware,
@@ -38,13 +40,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # /api/events
-@app.get("/")
+@app.get("/", tags=["Root"])
 @limiter.limit("5/minute")
 def read_root(request: Request):
     return {"Hello": "World"}
 
 
 
-@app.get("/healthz")
+@app.get("/healthz", tags=["Health"])
 def read_api_health():
     return {"status": "ok"}

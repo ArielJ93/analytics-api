@@ -29,10 +29,10 @@ router = APIRouter()
 
 # Get data here
 # List View
-# GET /api/events/
-@router.get("/", response_model=List[EventBucketSchema])
+
+@router.get("", response_model=List[EventBucketSchema])
 @limiter.limit("5/minute")
-def read_events(
+def get_crypto_metrics(
     request: Request,
     symbol: 
         Annotated[
@@ -92,9 +92,9 @@ def read_events(
 # SEND DATA HERE
 # create view
 # POST /api/events/
-@router.post("/", response_model=EventCreateResponse, dependencies=[Depends(apk)])
+@router.post("", response_model=EventCreateResponse, dependencies=[Depends(apk)])
 @limiter.limit("5/minute")
-def create_event(
+def insert_crypto_data(
         request: Request,
         payload: List[EventCreateSchema], 
         session: Session = Depends(get_session),

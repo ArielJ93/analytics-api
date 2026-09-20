@@ -4,11 +4,8 @@ gunicorn
 sqlmodel
 pydantic
 sqlalchemy
-#timescaledb
 requests
-#python-decouple
 psycopg[binary] # psycopg v3
-# psycopg2-binary
 slowapi
 redis
 pandas
