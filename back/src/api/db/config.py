@@ -6,7 +6,8 @@ from pydantic import Field
 class Settings(BaseSettings):
     DATABASE_URL: str = Field(default="")
     REDIS_URI: str = Field(default="")
-
+    AUTOMATION_API_KEY: str = Field(default="")
+    STREAMLIT_API_KEY: str = Field(default="")
     model_config = SettingsConfigDict(env_file=".env")
     
 settings = Settings()
