@@ -8,4 +8,3 @@ requests
 psycopg[binary] # psycopg v3
 slowapi
 redis
-pandas
