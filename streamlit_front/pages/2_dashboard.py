@@ -4,6 +4,7 @@ import requests
 import plotly.express as px
 import datetime
 
+st.set_page_config(page_title="Dashboard", page_icon="📊")
 
 base_url = "https://analytics-api-hg65.onrender.com"
 path = "/api/v1/analytics"
@@ -19,8 +20,7 @@ params = {
         'history': '7 days'
 }
 
-    
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=900)
 def get_api_data(url, params, headers):
     try:
         response = requests.get(url=url, params=params, headers=headers)
@@ -39,14 +39,14 @@ def get_api_data(url, params, headers):
 # if 'history_filter' not in st.session_state:
 #     st.session_state.history_filter = "1 day"
     
-def graph_callback():
-    pass
+
 
 with st.sidebar:
     st.sidebar.header("Dashboard V1")
     symbol_filter = st.multiselect('Select the crypto you want to visualize:', 
                 options= params['symbol'],
-                default= ['btc', 'eth', 'usdt', 'sol'])
+                default= ['btc'],
+                max_selections=1)
     st.divider()
     duration_filter = st.pills("Select the interval values:", options=["15 minutes","1 hour", "4 hours", "1 day"], default= "15 minutes")
     st.divider()
@@ -61,23 +61,45 @@ filter_params = {
         'history': history_filter
 }
 
-st.set_page_config(page_title="Dashboard", page_icon="📊")
-st.title("Crypto dashboard")
 
-with st.container(border=True):
-   
-    st.markdown("## Dashboard V1")
-    st.write(
-        """Testing the api call"""
-    )
+st.title("Crypto dashboard", anchor=False)
 
-with st.container(border=True):   
-    with st.spinner("Fetching data from API...", show_time=True):
-        df = get_api_data(url, filter_params, headers)    
-        line_graph_tab, df_tab = st.tabs(["Linear Graph", "Complete DataFrame"])
-        with line_graph_tab:
-            fig = px.line(df, x='bucket', y='avg_price', title='Crypto', color='symbol')
-            st.plotly_chart(fig)
-        with df_tab:
-            st.dataframe(df)
-
+if not symbol_filter:
+    with st.container(border=True):
+        st.warning("⚠️ **Please select at least one cryptocurrency in the sidebar to visualize the data.**")
+else:
+    with st.container(border=True):   
+        with st.spinner("Fetching data from API...", show_time=True):
+            df = get_api_data(url, filter_params, headers) 
+            metric_1, metric_2, metric_3 = st.columns(3)
+            with metric_1:
+                #delta is the percentage change between the first row  and the last row, the time interval between the first row and the last one represent the interval selected on the history filter.
+                delta_price = ((df['avg_price'].iloc[-1] - df['avg_price'].iloc[1]) / df['avg_price'].iloc[1]) * 100
+                st.metric("PRICE", value=df['avg_price'].iloc[-1], delta=f"{delta_price:.2f}%")
+            with metric_2:
+                delta_volume = ((df['volume_24h'].iloc[-1] - df['volume_24h'].iloc[1]) / df['volume_24h'].iloc[1]) * 100
+                st.metric("VOLUME 24H", value=df['volume_24h'].iloc[-1], delta=f"{delta_volume:.2f}%")
+            with metric_3:
+                delta_market = ((df['market_cap'].iloc[-1] - df['market_cap'].iloc[1]) / df['market_cap'].iloc[1]) * 100
+                st.metric("MARKET CAP", value=df['market_cap'].iloc[-1], delta=f"{delta_market:.2f}%")
+            line_graph_tab, df_tab = st.tabs(["Linear Graph", "Complete DataFrame"])
+            with line_graph_tab:
+                fig = px.line(df, x='bucket', y='avg_price', color='symbol')
+                fig.update_layout(
+                    title={
+                        'text': 'Average Price over time',
+                        'y':0.9,
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top'},
+                    xaxis=dict(
+                        title=dict(
+                            text="Time"
+                                        )),
+                    yaxis=dict(
+                        title=dict(
+                            text="Price"
+                                )))
+                st.plotly_chart(fig)
+            with df_tab:
+                st.dataframe(df)

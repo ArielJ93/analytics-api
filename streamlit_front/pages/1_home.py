@@ -34,7 +34,7 @@ with st.container(border=True):
     );
     ```
 
-    The database gets the data through a workflow with github actions using a script to extract data from coingecko API **every 5 minutes**, transform it and clean it, then finally inyect the data to the database using the POST private method of the crypto analytics API created.
+    The database gets the data through a workflow with github actions using a script to extract data from **coingecko API every 5 minutes**, transform it and clean it, then finally inyect the data to the database using the POST private method of the crypto analytics API created.
 
     The API only publicly allows to use the GET  method to extract data from the database. The data extracted consist of time buckets setted trough the parameters used on the API call.
     
