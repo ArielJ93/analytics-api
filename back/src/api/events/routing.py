@@ -31,7 +31,7 @@ router = APIRouter()
 # List View
 
 @router.get("", response_model=List[EventBucketSchema])
-@limiter.limit("5/minute")
+@limiter.limit("20/minute")
 def get_crypto_metrics(
     request: Request,
     symbol: 
