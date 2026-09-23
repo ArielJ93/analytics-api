@@ -18,9 +18,9 @@ params = {
         
         'history': '7 days'
 }
-    
 
-@st.cache_data(show_spinner="Fetching data from API...")
+    
+@st.cache_data(show_spinner=False)
 def get_api_data(url, params, headers):
     try:
         response = requests.get(url=url, params=params, headers=headers)
@@ -32,62 +32,52 @@ def get_api_data(url, params, headers):
         st.error(f"API error conexion: {e}")
         return None
 
-if 'symbols_filter' not in st.session_state:
-     st.session_state.symbols_filter = ['btc', 'eth', 'usdt', 'sol']
-def update_linear_graph():
+# if 'symbols_filter' not in st.session_state:
+#      st.session_state.symbols_filter = ['btc', 'eth', 'usdt', 'sol']
+# if 'duration_filter' not in st.session_state:
+#     st.session_state.duration_filter = "15 minutes"
+# if 'history_filter' not in st.session_state:
+#     st.session_state.history_filter = "1 day"
+    
+def graph_callback():
     pass
 
 with st.sidebar:
     st.sidebar.header("Dashboard V1")
-    st.multiselect('Select the crypto you want to visualize', 
+    symbol_filter = st.multiselect('Select the crypto you want to visualize:', 
                 options= params['symbol'],
-                key='symbols_filter')
+                default= ['btc', 'eth', 'usdt', 'sol'])
+    st.divider()
+    duration_filter = st.pills("Select the interval values:", options=["15 minutes","1 hour", "4 hours", "1 day"], default= "15 minutes")
+    st.divider()
+    history_filter = st.pills("Select the date of all the data you want to fecth:", options=["1 day","7 days", "30 days"], default= "1 day")
+
+
+filter_params = { 
+        'symbol': symbol_filter,
+        
+        'duration': duration_filter,
+        
+        'history': history_filter
+}
 
 st.set_page_config(page_title="Dashboard", page_icon="📊")
 st.title("Crypto dashboard")
+
 with st.container(border=True):
    
     st.markdown("## Dashboard V1")
     st.write(
         """Testing the api call"""
     )
-        
-with st.expander("Complete dataframe"):
-    df = get_api_data(url, params, headers)
-    st.write(df)
 
-"---"
-fig = px.line(df, x='bucket', y='avg_price', title='Crypto', color='symbol')
-st.plotly_chart(fig)
+with st.container(border=True):   
+    with st.spinner("Fetching data from API...", show_time=True):
+        df = get_api_data(url, filter_params, headers)    
+        line_graph_tab, df_tab = st.tabs(["Linear Graph", "Complete DataFrame"])
+        with line_graph_tab:
+            fig = px.line(df, x='bucket', y='avg_price', title='Crypto', color='symbol')
+            st.plotly_chart(fig)
+        with df_tab:
+            st.dataframe(df)
 
-
-    
-
-# st.write(st.session_state.symbols_filter)
-
-# params = { 
-#         'symbol': 'btc', 'eth', 'usdt', 'sol'
-#         'duration': '1 hour',
-#         'history': '7 days'
-# }         
-
-
-
-
-
-st.title('Counter Example')
-if 'count' not in st.session_state:
-    st.session_state.count = 0
-    st.session_state.last_updated = datetime.time(0,0)
-
-def update_counter():
-    st.session_state.count += st.session_state.increment_value
-    st.session_state.last_updated = st.session_state.update_time
-
-with st.form(key='my_form'):
-    st.time_input(label='Enter the time', value=datetime.datetime.now().time(), key='update_time')
-    st.number_input('Enter a value', value=0, step=1, key='increment_value')
-    submit = st.form_submit_button(label='Update', on_click=update_counter)
-
-st.write('Current Count = ', st.session_state.count)
-st.write('Last Updated = ', st.session_state.last_updated)

@@ -17,7 +17,7 @@ with st.container(border=True):
     ### Crypto Analytics FastAPI
     ###### Link to the github repo here 👉 [https://github.com/ArielJ93/analytics-api](https://github.com/ArielJ93/analytics-api)
     ---
-    **The present project consist of a dashboard of cryptocurrencies analytics with data obtained by calling a FastAPI endpoint**.
+    **The present project consist of a dashboard of cryptocurrencies with data obtained by calling a FastAPI endpoint**.
     
     This API connect natively to a database stored in Aiven cloud-managed services using timescaledb extension of Aiven. The application of hypertable was done using SQL inside the code to convert the SQLModel table to hypertable, defining the **chunks with an interval of 1 day**. Aiven free service doesn't allow some of the properties of timescaledb (the drop_after function is not available), so the chunk drops was manually setted inside Aiven with pg_cron extension. 
 
@@ -48,7 +48,7 @@ with st.container(border=True):
     * **`change_24h`**: the percentage price change of the cryptocurrency over the last 24 hours.
     
     ---
-    #### params
+    **params:**
 
     - symbol (required): this accept multiple symbols to extract more data
 
