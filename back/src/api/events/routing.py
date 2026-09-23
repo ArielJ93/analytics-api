@@ -39,11 +39,11 @@ def get_crypto_metrics(
             List[
                 Annotated[
                     str,
-                    StringConstraints(max_length=10, pattern=r"^[a-zA-Z0-9]+$")
+                    StringConstraints(max_length=12, pattern=r"^[a-zA-Z0-9_]+$")
                 ]
             ],
             Query(..., 
-                max_length=100, 
+                max_length=120, 
                 description=   
                     """**Top 100 Coingecko cryptos**
                     
