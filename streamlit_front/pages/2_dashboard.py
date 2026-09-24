@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import plotly.express as px
-import datetime
+from datetime import datetime
 
 st.set_page_config(page_title="Dashboard", page_icon="📊")
 
@@ -42,21 +42,22 @@ def get_api_data(url, params, headers):
 
 
 with st.sidebar:
-    st.sidebar.header("Dashboard V1")
-    selection_mode = st.radio("Crypto selection", options=["One coin", "Multiple coins"])
-    if selection_mode == "One coin":
-        symbol_filter = st.multiselect('Select the crypto you want to visualize:', 
-                options= params['symbol'],
-                default= ['btc'],
-                max_selections=1)
-    if selection_mode == "Multiple coins":
-        symbol_filter = st.multiselect('Select cryptos to compare:', 
+    st.title("Global filters")
+    with st.container():
+        selection_mode = st.radio("Crypto selection", options=["One coin", "Multiple coins"])
+        if selection_mode == "One coin":
+            symbol_filter = st.multiselect('Select the crypto you want to visualize:', 
                     options= params['symbol'],
-                    default= ['m', 'dot', 'render', 'atom'])
-    st.divider()
-    duration_filter = st.pills("Select the interval values:", options=["15 minutes","1 hour", "4 hours", "1 day"], default= "15 minutes")
-    st.divider()
-    history_filter = st.pills("Select the date of all the data you want to fecth:", options=["1 day","7 days", "30 days"], default= "1 day")
+                    default= ['btc'],
+                    max_selections=1)
+        if selection_mode == "Multiple coins":
+            symbol_filter = st.multiselect('Select cryptos to compare:', 
+                        options= params['symbol'],
+                        default= ['m', 'dot', 'render', 'atom'])
+        st.divider()
+        duration_filter = st.pills("Select the interval values:", options=["15 minutes","1 hour", "4 hours", "1 day"], default= "15 minutes")
+        st.divider()
+        history_filter = st.pills("Select the date of all the data you want to fecth:", options=["1 day","7 days", "30 days"], default= "1 day")
 
 
 filter_params = { 
@@ -72,7 +73,7 @@ st.title("Crypto dashboard", anchor=False)
 
 if not symbol_filter:
     with st.container(border=True):
-        st.warning("⚠️ **Please select at least one cryptocurrency in the sidebar to visualize the data.**")
+        st.warning("⚠️ **select at least one cryptocurrency in the sidebar to visualize the data.**")
 else:
     with st.container(border=True):   
         with st.spinner("Fetching data from API...", show_time=True):
@@ -90,7 +91,7 @@ else:
                     delta_market = ((df['market_cap'].iloc[-1] - df['market_cap'].iloc[1]) / df['market_cap'].iloc[1]) * 100
                     st.metric("MARKET CAP", value=df['market_cap'].iloc[-1], delta=f"{delta_market:.2f}%")
                 
-            line_graph_tab, bubble_chart, heat_map, df_tab = st.tabs(["Linear Graph", "Bubble Chart", "Heat Map", "Complete DataFrame"])
+            line_graph_tab, bubble_chart, tree_map, df_tab = st.tabs(["Linear Graph", "Bubble Chart", "Tree Map", "Complete DataFrame"])
             with line_graph_tab:
                 fig = px.line(df, x='bucket', y='avg_price', color='symbol')
                 fig.update_layout(
@@ -100,14 +101,9 @@ else:
                         'x':0.5,
                         'xanchor': 'center',
                         'yanchor': 'top'},
-                    xaxis=dict(
-                        title=dict(
-                            text="Time"
-                                        )),
-                    yaxis=dict(
-                        title=dict(
-                            text="Price $USD"
-                                )))
+                    xaxis=dict(title=dict(text="Time")),
+                    yaxis=dict(title=dict(text="Price $USD"))
+                    )
                 st.plotly_chart(fig)
             if len(symbol_filter) > 1:
                 with bubble_chart:
@@ -146,6 +142,18 @@ else:
                                 'xanchor': 'center',
                                 'yanchor': 'top'})
                         st.plotly_chart(fig)
+            with tree_map:
+                date = datetime.fromisoformat(last_date)
+                date_formated = date.strftime("%d/%m/%Y")
+                fig = px.treemap(
+                    df, 
+                    path=["symbol"], 
+                    values="market_cap", 
+                    color="change_24h", 
+                    color_continuous_scale='RdBu')
+                fig.update_traces(root_color="lightgrey")
+                fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+                st.plotly_chart(fig)
             with df_tab:
                 st.dataframe(df)
         
