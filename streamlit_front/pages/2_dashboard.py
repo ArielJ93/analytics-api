@@ -114,7 +114,10 @@ with st.container(border=True):
                             'xanchor': 'center',
                             'yanchor': 'top'},
                             xaxis_ticksuffix="%")
-                    fig.update_yaxes(tickformat="$~s")
+                    fig.update_yaxes(type="log",
+                                tickformat="$~s",
+                                nticks=6,
+                                dtick=1)
                     st.plotly_chart(fig, width='stretch')
             else:
                 last_date = df['bucket'].iloc[-1]
@@ -133,7 +136,10 @@ with st.container(border=True):
                         'xanchor': 'center',
                         'yanchor': 'top'},
                         xaxis_ticksuffix="%")
-                fig.update_yaxes(tickformat="$~s")
+                fig.update_yaxes(type="log",
+                                tickformat="$~s",
+                                nticks=6,
+                                dtick=1)
                 st.plotly_chart(fig, width='stretch')
                 
     with tree_map:
