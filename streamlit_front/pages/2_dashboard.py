@@ -3,12 +3,11 @@ import pandas as pd
 import requests
 import plotly.express as px
 from datetime import datetime
-
+from config import settings
 st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
 
-base_url = "https://analytics-api-hg65.onrender.com"
-path = "/api/v1/analytics"
-url = f"{base_url}{path}"
+
+url = settings.URL
 headers = {
     "content-type": "application/json"
 }
