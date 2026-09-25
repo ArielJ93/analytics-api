@@ -3,6 +3,7 @@ import pandas as pd
 from typing import List
 
 
+
 def transform_data(data: List) -> pd.DataFrame:
     
     df = pd.json_normalize(data)
@@ -51,5 +52,5 @@ if __name__ == "__main__":
     data = get_data()
     df = transform_data(data)
     df_test = cleaning_data(df)
-    print(type(df_test))
+    print(df_test['symbol'].unique().tolist())
     

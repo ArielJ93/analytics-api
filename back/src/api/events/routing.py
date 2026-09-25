@@ -31,7 +31,7 @@ router = APIRouter()
 # List View
 
 @router.get("", response_model=List[EventBucketSchema])
-@limiter.limit("5/minute")
+@limiter.limit("60/minute")
 def get_crypto_metrics(
     request: Request,
     symbol: 
@@ -39,11 +39,11 @@ def get_crypto_metrics(
             List[
                 Annotated[
                     str,
-                    StringConstraints(max_length=10, pattern=r"^[a-zA-Z0-9]+$")
+                    StringConstraints(max_length=12, pattern=r"^[a-zA-Z0-9_]+$")
                 ]
             ],
             Query(..., 
-                max_length=100, 
+                max_length=120, 
                 description=   
                     """**Top 100 Coingecko cryptos**
                     

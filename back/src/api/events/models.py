@@ -78,7 +78,7 @@ class EventBucketSchema(SQLModel):
 class DurationEnum(str, Enum): 
     fifteen_min = "15 minutes" 
     one_hour = "1 hour"
-    four_hour = '4 hour'
+    four_hour = '4 hours'
     one_day = "1 day"
     
 
