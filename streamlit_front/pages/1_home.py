@@ -15,7 +15,7 @@ with st.container(border=True):
     st.markdown(
         """
     ### Crypto Analytics FastAPI
-    ###### Link to the github repo here 👉 [https://github.com/ArielJ93/analytics-api](https://github.com/ArielJ93/analytics-api)
+    ###### Link to the github repo here 👉 [https://github.com/ArielJ93/streamlit-crypto-dashboard](https://github.com/ArielJ93/streamlit-crypto-dashboard)
     ---
     **The present project consist of a dashboard of cryptocurrencies with data obtained by calling a FastAPI endpoint**.
     
