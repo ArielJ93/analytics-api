@@ -1,10 +1,9 @@
-# Streamlit crypto analytics / FastAPI back / Aiven database
+# Streamlit crypto analytics 
 
-> 📌 **Project Note:** 
-> 
-> **The present project consist of a dashboard of cryptocurrencies with data obtained by calling a FastAPI endpoint**.
+
+**The present project consist of a dashboard of cryptocurrencies with data obtained by calling a FastAPI endpoint**
     
-    This API connect natively to a database stored in Aiven cloud-managed services using timescaledb extension of Aiven. The application of hypertable was done using SQL inside the code to convert the SQLModel table to hypertable, defining the **chunks with an interval of 1 day**. Aiven free service doesn't allow some of the properties of timescaledb (the drop_after function is not available), so the chunk drops was manually setted inside Aiven with pg_cron extension. 
+This API connect natively to a database stored in Aiven cloud-managed services using timescaledb extension of Aiven. The application of hypertable was done using SQL inside the code to convert the SQLModel table to hypertable, defining the **chunks with an interval of 1 day**. Aiven free service doesn't allow some of the properties of timescaledb (the drop_after function is not available), so the chunk drops was manually setted inside Aiven with pg_cron extension
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
@@ -49,5 +48,5 @@ Example extracting the data of the day about btc with intervals of 15 minutes:
 > **Credits**: 
     > this project was inspired following the FastAPI videotutorial created by **Codingforentrepreneurs**
 
-    > * [video](https://www.youtube.com/watch?v=tiBeLLv5GJo)
-    > * [github repo](https://github.com/codingforentrepreneurs/analytics-api) 
+> [video](https://www.youtube.com/watch?v=tiBeLLv5GJo)
+> [github repo](https://github.com/codingforentrepreneurs/analytics-api) 
