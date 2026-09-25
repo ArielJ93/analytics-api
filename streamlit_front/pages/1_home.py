@@ -62,7 +62,7 @@ with st.container(border=True):
     
 
     """)
-    st.image('assets/get_method.png', caption="https://analytics-api-hg65.onrender.com/docs")
+    st.image('streamlit_front/assets/get_method.png', caption="https://analytics-api-hg65.onrender.com/docs")
     
     
 with st.container(border=True):
