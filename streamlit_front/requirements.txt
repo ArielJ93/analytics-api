@@ -5,3 +5,4 @@ pandas
 numpy
 nbformat
 pydantic
+pydantic-settings
